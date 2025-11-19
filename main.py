@@ -14,7 +14,7 @@ class AudioRecorderApp(QApplication):
         super().__init__(argv)
         self.setApplicationName("Audio Recorder & Renderer")
         self.setApplicationVersion("0.1.0")
-        
+
         # Initialize main window
         self.main_window = MainWindow()
         self.main_window.show()
