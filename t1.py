@@ -252,8 +252,13 @@ class MainDialog(QWidget):
 
 if __name__ == "__main__":
     logger.remove()
-    logger.add(sys.stderr, level="INFO")
-    logger.add("./audio.log", level="INFO", rotation="10 MB", retention=5)
+    platform = sys.platform
+    if platform == 'darwin':
+        logger.add(sys.stderr, level="INFO")
+    if platform == "win32":
+        # 获取到 user data 目录
+        fp = os.path.join(os.path.expanduser("~"), "AppData", "Local", "audio")
+        logger.add(os.path.join(fp, "audio.log"), level="INFO", rotation="10 MB", retention=5)
     app = QApplication(sys.argv)
     demo = MainDialog()
     demo.show()
