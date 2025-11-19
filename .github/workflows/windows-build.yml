@@ -10,11 +10,10 @@ jobs:
     name: Build (Windows x86, Python 3.12)
     runs-on: windows-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
+      - uses: actions/checkout@v5
+          
       - name: Setup Python 3.12 (x86)
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v6
         with:
           python-version: '3.12'
           architecture: 'x86'
@@ -23,19 +22,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip setuptools wheel
 
-      - name: Install dependencies (with PyAudio fallback)
+      - name: Install dependencies
         shell: bash
         run: |
           set -e
-          if pip install -r requirements.txt; then
-            echo "requirements installed"
-          else
-            echo "pip install failed; trying pipwin for PyAudio"
-            python -m pip install --upgrade pip
-            pip install pipwin
-            pipwin install PyAudio || true
-            pip install -r requirements.txt
-          fi
+          python -m pip install --upgrade pip setuptools wheel
+          pip install -r requirements.txt
 
       - name: Quick syntax check
         run: |
