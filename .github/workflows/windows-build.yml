@@ -33,8 +33,13 @@ jobs:
           # Create a deterministic build folder and build a single-file exe
           uv run pyinstaller --noconsole --name audio_capture t1.py
 
+      - name: ls build
+        shell: bash
+        run: |
+          ls audio_capture/build
+
       - name: Upload exe artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: audio_capture_x64
-          path: dist/*.exe
+          path: audio_capture/build/*
