@@ -6,6 +6,9 @@ readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
     "loguru>=0.7.3",
+    "numpy>=2.3.5",
+    "pyaudio>=0.2.14",
+    "pyside6>=6.10.0",
 ]
 
 [[tool.uv.index]]
