@@ -20,7 +20,6 @@ class Worker(QObject):
     CHUNK = 1000  # 数据块大小
     RECORD_SECONDS = 10  # 录音时长
     WAVE_OUTPUT_FILENAME = "output.wav"  # 临时WAV文件名
-    TARGET_DEVICE_NAME = "MacBook Pro麦克风"  # 目标麦克风名称
 
     def __init__(self, idx):
         super().__init__()
@@ -32,7 +31,6 @@ class Worker(QObject):
             logger.warning("running!! can not start again")
             return
         self._is_running = True
-        self.device_index = device_index
         
         self.t = QThread()
         self.moveToThread(self.t)
