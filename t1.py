@@ -22,28 +22,16 @@ class Worker(QObject):
     WAVE_OUTPUT_FILENAME = "output.wav"  # 临时WAV文件名
     TARGET_DEVICE_NAME = "MacBook Pro麦克风"  # 目标麦克风名称
 
-    def __init__(self):
+    def __init__(self, idx):
         super().__init__()
         self._is_running = False
-        self.device_index = None
-
-    def find_device(self):
-        pa = pyaudio.PyAudio()
-        for i in range(pa.get_device_count()):
-            device_info = pa.get_device_info_by_index(i)
-            name = self.TARGET_DEVICE_NAME
-            if name in device_info['name']:
-                logger.debug(f"找到目标麦克风: {device_info['name']} (索引: {i})")
-                return i
-        logger.error(f"未找到目标麦克风: {self.TARGET_DEVICE_NAME}")
-        return None
+        self.device_index = idx
 
     def start(self):
         if self._is_running:
             logger.warning("running!! can not start again")
             return
         self._is_running = True
-        device_index = self.find_device()
         self.device_index = device_index
         
         self.t = QThread()
@@ -153,6 +141,8 @@ class ThreadExample(QWidget):
             self.mic_combo.addItem(m['name'])
         
         self.mic_combo.currentIndexChanged.connect(self.on_mic_selected)
+        if self.mic_combo.count() > 0:
+            self.mic_combo.setCurrentIndex(0)
         
         # TODO: Populate with available microphones
         # self.mic_combo.addItem("默认麦克风")
@@ -193,9 +183,9 @@ class ThreadExample(QWidget):
                         'name': device_info['name']
                     })
         except Exception as e:
-            self.error_occurred.emit(f"获取麦克风列表失败: {str(e)}")
+            logger.error(f"获取麦克风列表失败: {str(e)}")
             microphones.append({'index': 0, 'name': '默认麦克风'})
-        
+
         return microphones
 
     def update_status(self, status):
@@ -215,7 +205,7 @@ class ThreadExample(QWidget):
             QMessageBox.warning(self, "警告", "请选择麦克风")
             return
 
-        self.w = Worker()
+        self.w = Worker(self.selected_mic_index)
         self.w.progress.connect(self.on_progress)
         self.w.finished.connect(self.on_finished)
         self.w.start()
