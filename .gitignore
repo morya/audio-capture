@@ -1,2 +1,3 @@
 *.wav
 audio.log
+.vscode/launch.json
