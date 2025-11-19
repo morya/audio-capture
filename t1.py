@@ -252,8 +252,8 @@ class MainDialog(QWidget):
 
 if __name__ == "__main__":
     logger.remove()
-    logger.add("audio.log", level="INFO")
-    logger.add(sys.stderr, level="INFO", rotation="10 MB", encoding="utf-8", max_files=5)
+    logger.add(sys.stderr, level="INFO")
+    logger.add("./audio.log", level="INFO", rotation="10 MB", retention=5)
     app = QApplication(sys.argv)
     demo = MainDialog()
     demo.show()
