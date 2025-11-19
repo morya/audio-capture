@@ -4,7 +4,7 @@ from loguru import logger
 import wave
 
 from PySide6.QtCore import QThread, Signal, QObject
-from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QComboBox, QSizePolicy
 
 import pyaudio
 
@@ -133,21 +133,70 @@ class ThreadExample(QWidget):
         super().__init__()
         self.setWindowTitle("Audio Capture")
 
-        self.label_status = QLabel(self.LABEL_NOT_RUNNING)
-    
-        self.label = QLabel("进度: 0")
-        self.button = QPushButton("Start Thread")
-        
-        layout = QVBoxLayout()
-        layout.addWidget(self.button)
-        layout.addWidget(self.label)
-        layout.addWidget(self.label_status)
+        self.selected_mic_index = None
 
+        self.label_status = QLabel(self.LABEL_NOT_RUNNING)
+        self.label_progress = QLabel("进度: 0")
+        self.button = QPushButton("Start Thread")
+
+        layout = QVBoxLayout()
+
+        mic_layout = QHBoxLayout()
+        self.mic_label = QLabel("麦克风:", self)
+        mic_layout.addWidget(self.mic_label)
+        
+        self.mic_combo = QComboBox(self)
+        self.mic_combo.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+
+        mp = self.get_available_microphones()
+        for m in mp:
+            self.mic_combo.addItem(m['name'])
+        
+        self.mic_combo.currentIndexChanged.connect(self.on_mic_selected)
+        
+        # TODO: Populate with available microphones
+        # self.mic_combo.addItem("默认麦克风")
+        mic_layout.addWidget(self.mic_combo)
+
+        layout.addLayout(mic_layout)
+        layout.addStretch(1)
+        layout.addWidget(self.label_progress)
+        layout.addWidget(self.label_status)
+        layout.addWidget(self.button)
+        
         self.setLayout(layout)
 
         self.button.clicked.connect(self.toggle_thread)
 
         self.update_status(self.LABEL_NOT_RUNNING)
+
+    def on_mic_selected(self, index):
+        logger.info(f"mic selected: {index}")
+        self.selected_mic_index = index
+
+    def get_available_microphones(self):
+        """
+        Get a list of available microphones.
+        
+        Returns:
+            list: List of dictionaries containing microphone information (index, name)
+        """
+        microphones = []
+        
+        pa = pyaudio.PyAudio()
+        try:
+            for i in range(pa.get_device_count()):
+                device_info = pa.get_device_info_by_index(i)
+                if device_info['maxInputChannels'] > 0:  # Only input devices (microphones)
+                    microphones.append({
+                        'index': i,
+                        'name': device_info['name']
+                    })
+        except Exception as e:
+            self.error_occurred.emit(f"获取麦克风列表失败: {str(e)}")
+            microphones.append({'index': 0, 'name': '默认麦克风'})
+        
+        return microphones
 
     def update_status(self, status):
         if status == self.LABEL_RUNNING:
@@ -179,7 +228,7 @@ class ThreadExample(QWidget):
         self.update_status(self.LABEL_FINISHED)
 
     def on_progress(self, value):
-        self.label.setText(f"进度: {value}")
+        self.label_progress.setText(f"进度: {value}")
 
 
 if __name__ == "__main__":
