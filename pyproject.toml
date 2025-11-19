@@ -8,6 +8,7 @@ dependencies = [
     "loguru>=0.7.3",
     "numpy>=2.3.5",
     "pyaudio>=0.2.14",
+    "pyinstaller>=6.16.0",
     "pyside6>=6.10.0",
 ]
 
