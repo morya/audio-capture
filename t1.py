@@ -4,7 +4,7 @@ from loguru import logger
 import wave
 
 from PySide6.QtCore import QThread, Signal, QObject
-from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QComboBox, QSizePolicy
+from PySide6.QtWidgets import QApplication, QLabel, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QComboBox, QSizePolicy, QMessageBox
 
 import pyaudio
 
@@ -211,6 +211,10 @@ class ThreadExample(QWidget):
         self.update_status(self.LABEL_NOT_RUNNING)
 
     def start_thread(self):
+        if self.selected_mic_index is None:
+            QMessageBox.warning(self, "警告", "请选择麦克风")
+            return
+
         self.w = Worker()
         self.w.progress.connect(self.on_progress)
         self.w.finished.connect(self.on_finished)
