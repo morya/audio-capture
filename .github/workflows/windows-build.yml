@@ -2,7 +2,6 @@ name: Windows x64 Build
 
 on:
   push:
-    branches: [ main ]
   workflow_dispatch:
 
 jobs:
@@ -31,7 +30,7 @@ jobs:
         shell: bash
         run: |
           # Create a deterministic build folder and build a single-file exe
-          uv run pyinstaller --noconsole --name audio_capture t1.py
+          uv run pyinstaller --onefile --noconsole --name audio_capture t1.py
 
       - name: Upload exe artifact
         uses: actions/upload-artifact@v5
